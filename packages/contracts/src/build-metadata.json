@@ -6,10 +6,16 @@
       "description": "The information required for the installation of build 1.",
       "inputs": [
         {
-          "name": "number",
-          "type": "uint256",
+          "name": "protocol",
+          "type": "address",
           "internalType": "uint256",
-          "description": "The initial number to be stored."
+          "description": "The Web3 protocol contract address containing the `emergencySwitch(bool)` function."
+        },
+        {
+          "name": "switchController",
+          "type": "address",
+          "internalType": "uint256",
+          "description": "The address allowed to call the `emergencySwitch(bool)` function."
         }
       ]
     },

@@ -3,12 +3,13 @@ import buildMetadata from '../../src/build-metadata.json';
 import {
   DAOMock,
   DAOMock__factory,
-  MyPluginSetup,
-  MyPluginSetup__factory,
-  MyPlugin__factory,
+  CircuitBreakerSetup,
+  CircuitBreakerSetup__factory,
+  CircuitBreaker__factory,
 } from '../../typechain';
-import {STORE_PERMISSION_ID, defaultInitData} from './11_plugin';
+import {EMERGENCY_SWITCH_PERMISSION_ID, defaultInitData} from './11_plugin';
 import {
+  DAO_PERMISSIONS,
   Operation,
   PERMISSION_MANAGER_FLAGS,
   getNamedTypesFromMetadata,
@@ -22,7 +23,7 @@ type FixtureResult = {
   deployer: SignerWithAddress;
   alice: SignerWithAddress;
   bob: SignerWithAddress;
-  pluginSetup: MyPluginSetup;
+  pluginSetup: CircuitBreakerSetup;
   prepareInstallationInputs: string;
   prepareUninstallationInputs: string;
   daoMock: DAOMock;
@@ -31,13 +32,13 @@ type FixtureResult = {
 async function fixture(): Promise<FixtureResult> {
   const [deployer, alice, bob] = await ethers.getSigners();
   const daoMock = await new DAOMock__factory(deployer).deploy();
-  const pluginSetup = await new MyPluginSetup__factory(deployer).deploy();
+  const pluginSetup = await new CircuitBreakerSetup__factory(deployer).deploy();
 
   const prepareInstallationInputs = ethers.utils.defaultAbiCoder.encode(
     getNamedTypesFromMetadata(
       buildMetadata.pluginSetup.prepareInstallation.inputs
     ),
-    [defaultInitData.number]
+    [defaultInitData.protocol, defaultInitData.switchController]
   );
 
   const prepareUninstallationInputs = ethers.utils.defaultAbiCoder.encode(
@@ -82,14 +83,21 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
 
       expect(plugin).to.be.equal(anticipatedPluginAddress);
       expect(helpers.length).to.be.equal(0);
-      expect(permissions.length).to.be.equal(1);
+      expect(permissions.length).to.be.equal(2);
       expect(permissions).to.deep.equal([
         [
           Operation.Grant,
-          plugin,
           daoMock.address,
+          plugin,
           PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-          STORE_PERMISSION_ID,
+          DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
+        ],
+        [
+          Operation.Grant,
+          plugin,
+          defaultInitData.switchController,
+          PERMISSION_MANAGER_FLAGS.NO_CONDITION,
+          EMERGENCY_SWITCH_PERMISSION_ID,
         ],
       ]);
 
@@ -97,11 +105,12 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
         daoMock.address,
         prepareInstallationInputs
       );
-      const myPlugin = new MyPlugin__factory(deployer).attach(plugin);
+      const CircuitBreaker = new CircuitBreaker__factory(deployer).attach(
+        plugin
+      );
 
       // initialization is correct
-      expect(await myPlugin.dao()).to.eq(daoMock.address);
-      expect(await myPlugin.number()).to.be.eq(defaultInitData.number);
+      expect(await CircuitBreaker.dao()).to.eq(daoMock.address);
     });
   });
 
@@ -125,10 +134,10 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
       expect(permissions).to.deep.equal([
         [
           Operation.Revoke,
-          dummyAddr,
           daoMock.address,
+          dummyAddr,
           PERMISSION_MANAGER_FLAGS.NO_CONDITION,
-          STORE_PERMISSION_ID,
+          DAO_PERMISSIONS.EXECUTE_PERMISSION_ID,
         ],
       ]);
     });

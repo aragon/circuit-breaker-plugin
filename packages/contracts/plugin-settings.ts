@@ -14,8 +14,8 @@ export function generateRandomName(length: number): string {
 }
 
 // Specify your plugin implementation and plugin setup contract name.
-export const PLUGIN_CONTRACT_NAME = 'MyPlugin'; // See `packages/contracts/src/MyPlugin.sol`.
-export const PLUGIN_SETUP_CONTRACT_NAME = 'MyPluginSetup'; // See `packages/contracts/src/MyPluginSetup.sol`.
+export const PLUGIN_CONTRACT_NAME = 'CircuitBreaker'; // See `packages/contracts/src/CircuitBreaker.sol`.
+export const PLUGIN_SETUP_CONTRACT_NAME = 'CircuitBreakerSetup'; // See `packages/contracts/src/CircuitBreakerSetup.sol`.
 
 // Pick an ENS name for your plugin. E.g., 'my-cool-plugin'.
 // For more details, visit https://devs.aragon.org/docs/osx/how-it-works/framework/ens-names.

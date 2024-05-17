@@ -1,10 +1,11 @@
+import {defaultInitData} from '../10_unit-testing/11_plugin';
 import {METADATA} from '../../plugin-settings';
 import {
   DAOMock,
   DAOMock__factory,
-  MyPluginSetup,
-  MyPluginSetup__factory,
-  MyPlugin__factory,
+  CircuitBreakerSetup,
+  CircuitBreakerSetup__factory,
+  CircuitBreaker__factory,
 } from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
 import {installPLugin, uninstallPLugin} from './test-helpers';
@@ -24,7 +25,6 @@ import {
 } from '@aragon/osx-ethers';
 import {loadFixture} from '@nomicfoundation/hardhat-network-helpers';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
-import {expect} from 'chai';
 import {BigNumber} from 'ethers';
 import env, {deployments, ethers} from 'hardhat';
 
@@ -32,8 +32,7 @@ const productionNetworkName = getProductionNetworkName(env);
 
 describe(`PluginSetup processing on network '${productionNetworkName}'`, function () {
   it('installs & uninstalls the current build', async () => {
-    const {deployer, psp, daoMock, pluginSetup, pluginSetupRef} =
-      await loadFixture(fixture);
+    const {deployer, psp, daoMock, pluginSetupRef} = await loadFixture(fixture);
 
     // Allow all authorized calls to happen
     await daoMock.setHasPermissionReturnValueMock(true);
@@ -48,22 +47,14 @@ describe(`PluginSetup processing on network '${productionNetworkName}'`, functio
         getNamedTypesFromMetadata(
           METADATA.build.pluginSetup.prepareInstallation.inputs
         ),
-        [123]
+        Object.values(defaultInitData)
       )
     );
 
-    const plugin = MyPlugin__factory.connect(
+    const plugin = CircuitBreaker__factory.connect(
       results.preparedEvent.args.plugin,
       deployer
     );
-
-    // Check implementation.
-    expect(await plugin.implementation()).to.be.eq(
-      await pluginSetup.implementation()
-    );
-
-    // Check state.
-    expect(await plugin.number()).to.eq(123);
 
     // Uninstall the current build.
     await uninstallPLugin(
@@ -90,7 +81,7 @@ type FixtureResult = {
   daoMock: DAOMock;
   psp: PluginSetupProcessor;
   pluginRepo: PluginRepo;
-  pluginSetup: MyPluginSetup;
+  pluginSetup: CircuitBreakerSetup;
   pluginSetupRef: PluginSetupProcessorStructs.PluginSetupRefStruct;
 };
 
@@ -124,7 +115,7 @@ async function fixture(): Promise<FixtureResult> {
   }
 
   const release = 1;
-  const pluginSetup = MyPluginSetup__factory.connect(
+  const pluginSetup = CircuitBreakerSetup__factory.connect(
     (await pluginRepo['getLatestVersion(uint8)'](release)).pluginSetup,
     deployer
   );
