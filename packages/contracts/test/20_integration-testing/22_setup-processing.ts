@@ -3,9 +3,9 @@ import {METADATA} from '../../plugin-settings';
 import {
   DAOMock,
   DAOMock__factory,
-  CircuitBreakerSetup,
-  CircuitBreakerSetup__factory,
-  CircuitBreaker__factory,
+  SecurityBackstopSetup,
+  SecurityBackstopSetup__factory,
+  SecurityBackstop__factory,
 } from '../../typechain';
 import {getProductionNetworkName, findPluginRepo} from '../../utils/helpers';
 import {installPLugin, uninstallPLugin} from './test-helpers';
@@ -51,7 +51,7 @@ describe(`PluginSetup processing on network '${productionNetworkName}'`, functio
       )
     );
 
-    const plugin = CircuitBreaker__factory.connect(
+    const plugin = SecurityBackstop__factory.connect(
       results.preparedEvent.args.plugin,
       deployer
     );
@@ -81,7 +81,7 @@ type FixtureResult = {
   daoMock: DAOMock;
   psp: PluginSetupProcessor;
   pluginRepo: PluginRepo;
-  pluginSetup: CircuitBreakerSetup;
+  pluginSetup: SecurityBackstopSetup;
   pluginSetupRef: PluginSetupProcessorStructs.PluginSetupRefStruct;
 };
 
@@ -115,7 +115,7 @@ async function fixture(): Promise<FixtureResult> {
   }
 
   const release = 1;
-  const pluginSetup = CircuitBreakerSetup__factory.connect(
+  const pluginSetup = SecurityBackstopSetup__factory.connect(
     (await pluginRepo['getLatestVersion(uint8)'](release)).pluginSetup,
     deployer
   );

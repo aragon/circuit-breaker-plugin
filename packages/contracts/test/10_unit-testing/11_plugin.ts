@@ -1,4 +1,4 @@
-import '../../typechain/src/CircuitBreaker';
+import '../../typechain/src/SecurityBackstop';
 import {ethers} from 'hardhat';
 
 export type InitData = {protocol: string; switchController: string};

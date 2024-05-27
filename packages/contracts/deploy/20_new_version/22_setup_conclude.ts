@@ -1,5 +1,8 @@
 import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
-import {CircuitBreakerSetup__factory, CircuitBreaker__factory} from '../../typechain';
+import {
+  SecurityBackstopSetup__factory,
+  SecurityBackstop__factory,
+} from '../../typechain';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import path from 'path';
@@ -17,12 +20,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Get the plugin setup address
   const setupDeployment = await deployments.get(PLUGIN_SETUP_CONTRACT_NAME);
-  const setup = CircuitBreakerSetup__factory.connect(
+  const setup = SecurityBackstopSetup__factory.connect(
     setupDeployment.address,
     deployer
   );
   // Get the plugin implementation address
-  const implementation = CircuitBreaker__factory.connect(
+  const implementation = SecurityBackstop__factory.connect(
     await setup.implementation(),
     deployer
   );

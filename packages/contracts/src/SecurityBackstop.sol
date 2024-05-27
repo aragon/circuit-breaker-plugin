@@ -5,10 +5,10 @@ import {Plugin, IDAO} from "@aragon/osx-commons-contracts/src/plugin/Plugin.sol"
 
 import {Web3Protocol, EMERGENCY_SWITCH_PERMISSION_ID} from "./Web3Protocol.sol";
 
-/// @title CircuitBreaker
+/// @title SecurityBackstop
 /// @notice Allows an address with the `EMERGENCY_SWITCH_PERMISSION_ID` permission to stop the protocol in an emergency.
 /// @dev v1.1 (Release 1, Build 1)
-contract CircuitBreaker is Plugin {
+contract SecurityBackstop is Plugin {
     Web3Protocol private immutable PROTOCOL;
 
     constructor(IDAO _dao, Web3Protocol _protocol) Plugin(_dao) {

@@ -3,9 +3,9 @@ import buildMetadata from '../../src/build-metadata.json';
 import {
   DAOMock,
   DAOMock__factory,
-  CircuitBreakerSetup,
-  CircuitBreakerSetup__factory,
-  CircuitBreaker__factory,
+  SecurityBackstopSetup,
+  SecurityBackstopSetup__factory,
+  SecurityBackstop__factory,
 } from '../../typechain';
 import {EMERGENCY_SWITCH_PERMISSION_ID, defaultInitData} from './11_plugin';
 import {
@@ -23,7 +23,7 @@ type FixtureResult = {
   deployer: SignerWithAddress;
   alice: SignerWithAddress;
   bob: SignerWithAddress;
-  pluginSetup: CircuitBreakerSetup;
+  pluginSetup: SecurityBackstopSetup;
   prepareInstallationInputs: string;
   prepareUninstallationInputs: string;
   daoMock: DAOMock;
@@ -32,7 +32,9 @@ type FixtureResult = {
 async function fixture(): Promise<FixtureResult> {
   const [deployer, alice, bob] = await ethers.getSigners();
   const daoMock = await new DAOMock__factory(deployer).deploy();
-  const pluginSetup = await new CircuitBreakerSetup__factory(deployer).deploy();
+  const pluginSetup = await new SecurityBackstopSetup__factory(
+    deployer
+  ).deploy();
 
   const prepareInstallationInputs = ethers.utils.defaultAbiCoder.encode(
     getNamedTypesFromMetadata(
@@ -105,12 +107,12 @@ describe(PLUGIN_SETUP_CONTRACT_NAME, function () {
         daoMock.address,
         prepareInstallationInputs
       );
-      const CircuitBreaker = new CircuitBreaker__factory(deployer).attach(
+      const SecurityBackstop = new SecurityBackstop__factory(deployer).attach(
         plugin
       );
 
       // initialization is correct
-      expect(await CircuitBreaker.dao()).to.eq(daoMock.address);
+      expect(await SecurityBackstop.dao()).to.eq(daoMock.address);
     });
   });
 

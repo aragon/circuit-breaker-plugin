@@ -8,18 +8,18 @@ import {PluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/Plugin
 import {IPluginSetup} from "@aragon/osx-commons-contracts/src/plugin/setup/IPluginSetup.sol";
 import {IDAO} from "@aragon/osx-commons-contracts/src/dao/IDAO.sol";
 
-import {CircuitBreaker} from "./CircuitBreaker.sol";
+import {SecurityBackstop} from "./SecurityBackstop.sol";
 import {Web3Protocol, EMERGENCY_SWITCH_PERMISSION_ID, EXECUTE_PERMISSION_ID} from "./Web3Protocol.sol";
 
-/// @title CircuitBreakerSetup
+/// @title SecurityBackstopSetup
 /// @dev Release 1, Build 1
-contract CircuitBreakerSetup is PluginSetup {
+contract SecurityBackstopSetup is PluginSetup {
     using ProxyLib for address;
 
-    /// @notice Constructs the `PluginSetup` by storing the `CircuitBreaker` implementation address.
+    /// @notice Constructs the `PluginSetup` by storing the `SecurityBackstop` implementation address.
     /// @dev The implementation address is used to verify the plugin on the respective block explorers.
     constructor()
-        PluginSetup(address(new CircuitBreaker(IDAO(address(0)), Web3Protocol(address(0)))))
+        PluginSetup(address(new SecurityBackstop(IDAO(address(0)), Web3Protocol(address(0)))))
     {}
 
     /// @inheritdoc IPluginSetup
@@ -32,7 +32,7 @@ contract CircuitBreakerSetup is PluginSetup {
             (Web3Protocol, address)
         );
 
-        plugin = address(new CircuitBreaker(IDAO(_dao), protocol));
+        plugin = address(new SecurityBackstop(IDAO(_dao), protocol));
 
         PermissionLib.MultiTargetPermission[]
             memory permissions = new PermissionLib.MultiTargetPermission[](2);
